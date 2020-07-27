@@ -10,6 +10,7 @@ if(sandboxEnabled) {
     # Copy the contents of the main script to clipboard
     Get-Content ./Main.ps1 | clip
     echo "Main script copied to clipboard, opening VM..."
+    echo "At the PowerShell prompt: run 'Set-ExecutionPolicy RemoteSigned' then 'Get-Clipboard > x.ps1' and finally './x.ps1'"
     echo "Booting Windows Sandbox..."
     WindowsSandbox.exe
 } else {

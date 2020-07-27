@@ -4,7 +4,7 @@ $script_start = Get-Date
 echo "`nWelcome back Reece! - it's currently $script_start`nStarting...`n"
 
 
-echo "Installing Chocolatey..."
+echo "`tInstalling Chocolatey..."
 echo "`tSetting required execution policy..."
 set-ExecutionPolicy AllSigned
 echo "`Downloading and running install.ps1..."
