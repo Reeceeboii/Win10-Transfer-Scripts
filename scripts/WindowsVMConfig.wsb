@@ -1,0 +1,14 @@
+<Configuration>
+    <Networking>Enable</Networking>
+    <VGpu>Enable</VGpu> 
+    <MappedFolders>
+        <MappedFolder>
+            <HostFolder>C:\Temp</HostFolder>
+            <ReadOnly>true</ReadOnly>
+        </MappedFolder>
+    </MappedFolders>
+    <LogonCommand>
+        <Command>powershell.exe</Command>
+        <Command>explorer.exe</Command>
+    </LogonCommand>
+</Configuration>

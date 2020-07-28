@@ -13,7 +13,7 @@ if(sandboxEnabled) {
     echo "Main script copied to clipboard and new log file generated, opening VM..."
     echo "At the PowerShell prompt: run 'Set-ExecutionPolicy RemoteSigned' then 'Get-Clipboard > x.ps1' and finally './x.ps1'"
     echo "Booting Windows Sandbox..."
-    WindowsSandbox.exe
+    ./WindowsVMConfig.wsb
 } else {
     # Do I actually want to enable it?
     $resp = Read-Host -Prompt "Windows Sandbox is not enabled, would you like to enable? [Y/N]: "
