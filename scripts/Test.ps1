@@ -1,5 +1,7 @@
 ﻿#Requires -RunAsAdministrator
 
+$temp_dir = "C:\Temp"
+
 # Is the Windows sandbox optional feature turned on?
 function sandboxEnabled{
     [bool](Get-WindowsOptionalFeature -Online | Where-Object FeatureName -eq Containers-DisposableClientVM).State
@@ -7,12 +9,14 @@ function sandboxEnabled{
 
 # Is windows sandbox enabled on this system?
 if(sandboxEnabled) {
-    # Copy the contents of the main script to clipboard
-    Get-Content ./Main.ps1 | clip
+    # Generate and copy the packages log to C:\Temp
     ./ChocolateyBackup.ps1
-    echo "Main script copied to clipboard and new log file generated, opening VM..."
-    echo "At the PowerShell prompt: run 'Set-ExecutionPolicy RemoteSigned' then 'Get-Clipboard > x.ps1' and finally './x.ps1'"
-    echo "Booting Windows Sandbox..."
+    Copy-Item ./packages.log $temp_dir
+    # And the same for the main script
+    Copy-Item ./Main.ps1 $temp_dir
+    echo "Main script and package log generated and copied to $temp_dir, opening VM..."
+    echo "At the PowerShell prompt: run './Main.ps1'"
+    # Make sure there's a file ext. association here dummy
     ./WindowsVMConfig.wsb
 } else {
     # Do I actually want to enable it?

@@ -8,7 +8,6 @@
         </MappedFolder>
     </MappedFolders>
     <LogonCommand>
-        <Command>powershell.exe</Command>
-        <Command>explorer.exe</Command>
+        <Command>powershell.exe -noexit -command "cd ~/Desktop/Temp; Set-ExecutionPolicy RemoteSigned" </Command>
     </LogonCommand>
 </Configuration>
