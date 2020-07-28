@@ -15,7 +15,7 @@ $choco_install_str = "choco install "
 foreach ($line in Get-Content ./packages.log){
     $choco_install_str += $line + " "
 }
-$choco_install_str += "-y"
+$choco_install_str += "--ignore-checksums -y"
 # Execute the install string
 iex($choco_install_str)
 
