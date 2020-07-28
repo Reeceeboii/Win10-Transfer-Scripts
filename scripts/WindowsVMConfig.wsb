@@ -4,7 +4,7 @@
     <MappedFolders>
         <MappedFolder>
             <HostFolder>C:\Temp</HostFolder>
-            <ReadOnly>true</ReadOnly>
+            <ReadOnly>false</ReadOnly>
         </MappedFolder>
     </MappedFolders>
     <LogonCommand>

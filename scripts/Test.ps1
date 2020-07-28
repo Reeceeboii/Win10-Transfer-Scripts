@@ -2,10 +2,12 @@
 
 $temp_dir = "C:\Temp"
 
+
 # Is the Windows sandbox optional feature turned on?
 function sandboxEnabled{
     [bool](Get-WindowsOptionalFeature -Online | Where-Object FeatureName -eq Containers-DisposableClientVM).State
 }
+
 
 # Is windows sandbox enabled on this system?
 if(sandboxEnabled) {

@@ -1,4 +1,4 @@
-# Reece-Win10-Quick-Start
+# Win10-Transfer-Scripts
 ## Some PowerShell scripts to help me quickly get up and running on a fresh install of Windows 10.
 
 ## Why?
@@ -24,6 +24,8 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 * ✔️ Enabling Windows Sandbox as a Windows feature
 * ✔️ Enabling WSL & installing Ubuntu
 * ✔️ Changing registry settings for things like file extensions and hidden files, folders and drives
-* 🔧 Generate new set of SSH keys for auth with GitHub
+* ✔️ Generate new set of SSH keys for auth with GitHub
+* ✔️ Set up global Git info like name/username
 * 🔧 Take a running log of the entirety of `Main.ps1` as it's doing its stuff
 * 🔧 Use a generated alias file from the old system to re-import all CLI aliases
+* 🔧 Make sure PATH is set correctly for things like Python and Java
