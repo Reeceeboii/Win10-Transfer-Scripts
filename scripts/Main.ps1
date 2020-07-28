@@ -40,6 +40,8 @@ Set-ItemProperty . HideFileExt "0"
 # Show hidden files, folders and drives
 Set-ItemProperty . Hidden "1" 
 Pop-Location
+# Apply file system changes by force restarting explorer.exe
+Stop-Process -processName: Explorer -force
 
 
 # CLEAN UP
