@@ -9,6 +9,6 @@ Some PowerShell scripts to help me quickly get working on a new windows install
 
 ## On the new system
 * Installing chocolatey
-* **Using log file to reinstall all software**
+* Using log file to reinstall all software
 * **Enabling Windows Sandbox as a Windows feature**
 * **Enabling WSL & installing Ubuntu**
