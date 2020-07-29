@@ -9,7 +9,7 @@ echo "`nWelcome back Reece! - it's currently $script_start`nStarting...`n"
 echo "`tInstalling Chocolatey..."
 echo "`tSetting required execution policy..."
 set-ExecutionPolicy AllSigned
-echo "`Downloading and running Chocolatey install script..."
+echo "`tDownloading and running Chocolatey install script..."
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 <#
@@ -29,10 +29,10 @@ choco install -y git
 # WINDOWS FEATURES
 # We only want to do these if outside of the sandbox or it will just spew errors out
 if(-not ($env:UserName -eq "WDAGUtilityAccount")) {
-    echo "Attempting to enable Windows Sandbox..."
+    echo "`tAttempting to enable Windows Sandbox..."
     # Enable the 'Containers-DisposableClientVM' (sandbox) feature
     Enable-WindowsOptionalFeature -FeatureName Containers-DisposableClientVM -Online -NoRestart -ErrorAction Stop
-    echo "Attempting to enable WSL..."
+    echo "`tAttempting to enable WSL..."
     # Enable the 'Microsoft-Windows-Subsystem-Linux' (WSL) feature
     Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online -NoRestart -ErrorAction Stop
 }
@@ -58,15 +58,20 @@ refreshenv
 
 # GIT SETUP
 # Commit details
-echo "Setting up git config details..."
 $git_email = "reecemercer981@gmail.com"
+echo "`tSetting up git config details..."
 git config --global user.name "Reece Mercer"
 git config --global user.email $git_email
 # SSH keys
 ssh-keygen -t rsa -b 4096 -C $git_email
-echo "ssh keys generated! - go to ~/.ssh"
+echo "`tssh keys generated! - go to ~/.ssh"
 
+Get-Content ./aliases.log
+
+$script_end = Get-Date
+echo "`tScript took $(($script_end - $script_start).Minutes) minutes and $(($script_end - $script_start).Seconds) seconds!"
 
 # CLEAN UP
 rm ./Main.ps1
 rm ./packages.log
+rm ./aliases.log

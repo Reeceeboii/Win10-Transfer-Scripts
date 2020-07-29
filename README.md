@@ -8,7 +8,7 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 
 * `Main.ps1`: main driver script - does all the heavy lifting.
 * `Test.ps1`: boots up a Windows Sandbox instance to test `Main.ps1` in an isolated environment
-* `ChocolateyBackup.ps1`: creates a log file that contains the names of all currently installed packages
+* `Backup.ps1`: creates backup files of Chocolatey packages and PowerShell aliases
 
 ## Development progress
 ✔️ Done 🔧 Under development

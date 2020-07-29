@@ -2,7 +2,6 @@
 
 $temp_dir = "C:\Temp"
 
-
 # Is the Windows sandbox optional feature turned on?
 function sandboxEnabled{
     [bool](Get-WindowsOptionalFeature -Online | Where-Object FeatureName -eq Containers-DisposableClientVM).State
@@ -11,9 +10,10 @@ function sandboxEnabled{
 
 # Is windows sandbox enabled on this system?
 if(sandboxEnabled) {
-    # Generate and copy the packages log to C:\Temp
-    ./ChocolateyBackup.ps1
+    # Generate and copy the packages & aliases log to C:\Temp
+    ./Backup.ps1 -c -a
     Copy-Item ./packages.log $temp_dir
+    Copy-Item ./aliases.log $temp_dir
     # And the same for the main script
     Copy-Item ./Main.ps1 $temp_dir
     echo "Main script and package log generated and copied to $temp_dir, opening VM..."
