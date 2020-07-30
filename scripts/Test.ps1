@@ -11,7 +11,7 @@ function sandboxEnabled{
 # Is windows sandbox enabled on this system?
 if(sandboxEnabled) {
     # Generate and copy the packages & aliases log to C:\Temp
-    ./Backup.ps1 -c -a
+    ./Backup.ps1 -p -a
     Copy-Item ./packages.log $temp_dir
     Copy-Item ./aliases.log $temp_dir
     # And the same for the main script
