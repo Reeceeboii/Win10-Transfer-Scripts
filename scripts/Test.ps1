@@ -11,13 +11,13 @@ function sandboxEnabled{
 # Is windows sandbox enabled on this system?
 if(sandboxEnabled) {
     # Generate and copy the packages & aliases log to C:\Temp
-    ./Backup.ps1 -p -a
+    ./Backup.ps1 -packages -aliases
     Copy-Item ./packages.log $temp_dir
     Copy-Item ./aliases.log $temp_dir
     # And the same for the main script
     Copy-Item ./Main.ps1 $temp_dir
     echo "Main script and package log generated and copied to $temp_dir, opening VM..."
-    echo "At the PowerShell prompt: run './Main.ps1'"
+    echo "At the PowerShell prompt: 'Set-ExecutionPolicy unrestricted -Scope CurrentUser -Force' before executing script"
     # Make sure there's a file ext. association here dummy
     ./WindowsVMConfig.wsb
 } else {

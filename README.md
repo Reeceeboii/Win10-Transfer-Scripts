@@ -27,5 +27,5 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 * ✔️ Generate new set of SSH keys for auth with GitHub
 * ✔️ Set up global Git info like name/username
 * 🔧 Take a running log of the entirety of `Main.ps1` as it's doing its stuff
-* 🔧 Use a generated alias file from the old system to re-import all CLI aliases
+* ✔️ Use a generated alias file from the old system to re-import all CLI aliases
 * 🔧 Make sure PATH is set correctly for things like Python and Java

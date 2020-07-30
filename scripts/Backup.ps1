@@ -43,4 +43,3 @@ if($clean){
     Remove-Item "C:\Temp\aliases.log"
     echo "Local copies have been cleaned!"
 }
-
