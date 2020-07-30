@@ -32,3 +32,6 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 ## Notes to self
 - Running `Set-ExecutionPolicy unrestricted -Scope CurrentUser -Force` before executing `Main.ps1` is required. Installing Chocolatey requires invoking a script from the web. Also, running the `profile.ps1` script that is created to contain all of the aliases requires unsigned script execution permission. Simply setting this to be unrestricted solves this.
 - Not all of the software backed up in the log will want to be installed on a new system, so just scan through this and remove anything that isn't needed.
+
+## After script has executed
+- Upload new public SSH key to https://github.com/settings/keys
