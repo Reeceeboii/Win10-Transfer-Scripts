@@ -26,9 +26,9 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 * ✔️ Changing registry settings for things like file extensions and hidden files, folders and drives
 * ✔️ Generate new set of SSH keys for auth with GitHub
 * ✔️ Set up global Git info like name/username
-* 🔧 Take a running log of the entirety of `Main.ps1` as it's doing its stuff
 * ✔️ Use a generated alias file from the old system to re-import all CLI aliases
-* 🔧 Make sure PATH is set correctly for things like Python and Java
+* 🔧 Take a running log of the entirety of `Main.ps1` as it's doing its stuff
 
-## Notes
-Running `Set-ExecutionPolicy unrestricted -Scope CurrentUser -Force` before executing `Main.ps1` is required. Installing Chocolatey requires `iex`ing a script from the web. Also, running the `profile.ps1` script that is created to contain all of the aliases also requires unsigned script executions permissions. Simply setting this to be unrestricted system-wide solves this. 
+## Notes to self
+- Running `Set-ExecutionPolicy unrestricted -Scope CurrentUser -Force` before executing `Main.ps1` is required. Installing Chocolatey requires invoking a script from the web. Also, running the `profile.ps1` script that is created to contain all of the aliases requires unsigned script execution permission. Simply setting this to be unrestricted solves this.
+- Not all of the software backed up in the log will want to be installed on a new system, so just scan through this and remove anything that isn't needed.
