@@ -29,3 +29,6 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 * 🔧 Take a running log of the entirety of `Main.ps1` as it's doing its stuff
 * ✔️ Use a generated alias file from the old system to re-import all CLI aliases
 * 🔧 Make sure PATH is set correctly for things like Python and Java
+
+## Notes
+Running `Set-ExecutionPolicy unrestricted -Scope CurrentUser -Force` before executing `Main.ps1` is required. Installing Chocolatey requires `iex`ing a script from the web. Also, running the `profile.ps1` script that is created to contain all of the aliases also requires unsigned script executions permissions. Simply setting this to be unrestricted system-wide solves this. 
