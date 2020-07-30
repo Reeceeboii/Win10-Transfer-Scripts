@@ -4,13 +4,16 @@ param (
     [switch]$clean = $false
 )
 
+$temp_dir = "C:\Temp"
 
 # Takes a list of locally installed chocolatey packages and stores them in a log file
 if($packages){
     clist -l -idonly -r > packages.log
-    echo "All packages backed up to package.log (C:\Temp & Personal OneDrive)"
-    # Also upload packages.log to personal OneDrive folder
+    # Upload packages.log to personal OneDrive folder and copy to C:\Temp
     Copy-Item ./packages.log $env:OneDriveConsumer
+    Copy-Item ./packages.log $temp_dir
+    echo "All packages backed up to package.log (C:\Temp & Personal OneDrive)"
+
 }
 
 
@@ -19,11 +22,12 @@ if($aliases){
     $alias_log = foreach($alias in Get-Alias){
         $name = $alias.Name
         $def = $alias.Definition
-        echo "$name->$def"
+        echo "$name,$def"
     }
     $alias_log > .\aliases.log
-    # Also upload aliases.log to personal OneDrive folder
+    # Upload aliases.log to personal OneDrive folder and copy to C:\Temp
     Copy-Item ./aliases.log $env:OneDriveConsumer
+    Copy-Item ./aliases.log $temp_dir
     echo "All aliases backed up to aliases.log (C:\Temp & Personal OneDrive)"
 }
 

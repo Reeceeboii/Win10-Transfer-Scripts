@@ -16,7 +16,7 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 ### On the old system
 * ✔️ Backing up currently installed Chocolately packages into a log file
 * ✔️ Using a test script to boot up a Windows Sandbox instance to test the main script out safely away from my main machine in case things go boom (and also to test software installs that would obviously already exist on my main machine)
-* 🔧 Making a log file of all existing PowerShell aliases
+* ✔️ Making a log file of all existing PowerShell aliases
 
 ### On the new system
 * ✔️ Installing chocolatey
