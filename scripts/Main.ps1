@@ -2,33 +2,33 @@
 
 
 $script_start = Get-Date
-echo "`nWelcome back Reece! - it's currently $script_start`nStarting...`n"
+Write-Host "`nIt's currently $script_start`nStarting...`n"
 
 
 # INSTALLING CHOCOLATEY
-echo "`tInstalling Chocolatey..."
-echo "`tDownloading and running Chocolatey install script..."
+Write-Host "`tInstalling Chocolatey..."
+Write-Host "`tDownloading and running Chocolatey install script..."
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
-iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 
 # INSTALLING ALL PREVIOUSLY BACKED UP CHOCOLATEY PACKAGES
 $choco_install_str = "choco install "
-foreach ($line in Get-Content ./packages.log){
+foreach ($line in Get-Content ./packages.log) {
     $choco_install_str += $line + " "
 }
 $choco_install_str += "--ignore-checksums -y"
 # Execute the install string
-iex($choco_install_str)
+Invoke-Expression($choco_install_str)
 
 
 # WINDOWS FEATURES
 # We only want to do these if outside of the sandbox or it will just spew errors out
-if(-not ($env:UserName -eq "WDAGUtilityAccount")) {
-    echo "`tAttempting to enable Windows Sandbox..."
+if (-not ($env:UserName -eq "WDAGUtilityAccount")) {
+    Write-Host "`tAttempting to enable Windows Sandbox..."
     # Enable the 'Containers-DisposableClientVM' (sandbox) feature
     Enable-WindowsOptionalFeature -FeatureName Containers-DisposableClientVM -Online -NoRestart -ErrorAction Stop
-    echo "`tAttempting to enable WSL..."
+    Write-Host "`tAttempting to enable WSL..."
     # Enable the 'Microsoft-Windows-Subsystem-Linux' (WSL) feature
     Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online -NoRestart -ErrorAction Stop
 }
@@ -57,12 +57,12 @@ refreshenv
 # GIT SETUP
 # Commit details
 $git_email = "reecemercer981@gmail.com"
-echo "`tSetting up git config details..."
+Write-Host "`tSetting up git config details..."
 git config --global user.name "Reece Mercer"
 git config --global user.email $git_email
 # SSH keys
 ssh-keygen -t rsa -b 4096 -C $git_email
-echo "`tssh keys generated! - go to ~/.ssh"
+Write-Host "`tssh keys generated! - go to ~/.ssh"
 
 
 
@@ -72,11 +72,11 @@ What we do here is output an alias registration command for each alias, save it 
 send that var to a file (profile.ps1). That file can then be sent directly to $PsHome so that all aliases are 
 carried over across different sessions
 #>
-$profile_ps1 = foreach($alias_pair in Get-Content aliases.log){
+$profile_ps1 = foreach ($alias_pair in Get-Content aliases.log) {
     $name = $alias_pair.Split(",")[0]
     $mapped_to = $alias_pair.Split(",")[1]
     # If the alias doesn't already exist, register it
-    echo "Set-Alias $name $mapped_to -ErrorAction SilentlyContinue"
+    Write-Host "Set-Alias $name $mapped_to -ErrorAction SilentlyContinue"
 }
 
 # Write alias setups to profile.ps1 in the PowerShell home directory
@@ -84,7 +84,7 @@ $profile_ps1 > (Join-Path -Path $PsHome -ChildPath "profile.ps1")
 
 
 $script_end = Get-Date
-echo "`tScript took $(($script_end - $script_start).Minutes) minutes and $(($script_end - $script_start).Seconds) seconds!"
+Write-Host "`tScript took $(($script_end - $script_start).Minutes) minutes and $(($script_end - $script_start).Seconds) seconds!"
 
 
 # CLEAN UP
