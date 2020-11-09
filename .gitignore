@@ -1,2 +1,4 @@
 # chocolatey logs generated during tests
 *.log
+# local temp backup directory
+backup/
