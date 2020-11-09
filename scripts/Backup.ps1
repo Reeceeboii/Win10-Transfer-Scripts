@@ -1,45 +1,86 @@
+<#
+    .SYNOPSIS
+    Makes backups of instsalled chocolatey packages, PowerShell aliases and Rainmeter skins.
+
+    .DESCRIPTION
+    Sends the files to consumer OneDrive folder for retrieval on other machines, and to C:\Temp for local testing
+
+    .PARAMETER Packages
+    Switch that is enabled if Chocolatey packages are to be backed up
+
+    .PARAMETER Aliases
+    Switch that is enabled if PowerShell aliases are to be backed up
+
+    .PARAMETER RainmeterSkins
+    Switch that is enabled if Rainmeter skins are to be backed up
+
+    .PARAMETER Clean
+    Switch that is enabled if created backups are to be removed from C:\Temp and OneDrive
+
+    .INPUTS
+    None.
+
+    .OUTPUTS
+    None
+
+    .EXAMPLE
+    PS> Backup.ps1 -Packages -Aliases -RainmeterSkins
+    [backs up packages, aliases and Rainmeter skins]
+
+    .EXAMPLE
+    PS> Backup.ps1 -Clean
+    [Removes backup files from C:\Temp and OneDrive]
+#>
+
 param (
-    [switch]$packages = $false,
-    [switch]$aliases = $false,
-    [switch]$clean = $false
+    [switch]$Packages = $false,
+    [switch]$Aliases = $false,
+    [switch]$RainmeterSkins = $false,
+    [switch]$Clean = $false
 )
 
-$temp_dir = "C:\Temp"
+$tempDir = "C:\Temp"
+$backupDirName = "WIN10TSBACKUPS"
+$consumerOneDrive = Join-Path -Path $env:OneDriveConsumer -ChildPath $backupDirName
+
 
 # Takes a list of locally installed chocolatey packages and stores them in a log file
-if ($packages) {
-    clist -l -idonly -r > packages.log
+if ($Packages) {
+    if (-not (Test-Path -Path $consumerOneDrive)) {
+        New-Item -Path $env:OneDriveConsumer -Name $backupDirName -ItemType "directory"
+        Write-Host "Created OneDrive backup folder" -ForegroundColor Green
+    }
+    clist -l -idonly -r | Out-File -FilePath ./packages.log
+    Write-Host "packages.log file created" -ForegroundColor Green
     # Upload packages.log to personal OneDrive folder and copy to C:\Temp
-    Copy-Item ./packages.log $env:OneDriveConsumer
-    Copy-Item ./packages.log $temp_dir
-    Write-Host "All packages backed up to package.log (C:\Temp & Personal OneDrive)"
-
+    Copy-Item ./packages.log $consumerOneDrive
+    Copy-Item ./packages.log $tempDir
+    Remove-Item ./packages.log
+    Write-Host "All packages backed up to package.log (C:\Temp & Personal OneDrive backup folder)" -ForegroundColor Green
 }
 
 
 # Takes a list of all PowerShell aliases and stores them in a log file
-if ($aliases) {
-    $alias_log = foreach ($alias in Get-Alias) {
-        $name = $alias.Name
-        $def = $alias.Definition
-        Write-Host "$name,$def"
-    }
-    $alias_log > .\aliases.log
+if ($Aliases) {
+    Get-Alias | ForEach-Object { "$($_.Name),$($_.Definition)" } | Out-File -FilePath ./aliases.log
+    Write-Host "aliases.log file created" -ForegroundColor Green
     # Upload aliases.log to personal OneDrive folder and copy to C:\Temp
-    Copy-Item ./aliases.log $env:OneDriveConsumer
-    Copy-Item ./aliases.log $temp_dir
-    Write-Host "All aliases backed up to aliases.log (C:\Temp & Personal OneDrive)"
+    Copy-Item ./aliases.log $consumerOneDrive
+    Copy-Item ./aliases.log $tempDir
+    Remove-Item ./aliases.log
+    Write-Host "All aliases backed up to aliases.log (C:\Temp & Personal OneDrive backup folder)" -ForegroundColor Green
 }
 
 
 # Delete package and alias logs from local drive and OneDrive
-if ($clean) {
+if ($Clean) {
     # OneDrive copies
-    Remove-Item (Join-Path -Path $env:OneDriveConsumer -ChildPath packages.log)
-    Remove-Item (Join-Path -Path $env:OneDriveConsumer -ChildPath aliases.log)
-    Write-Host "Uploaded OneDrive copies have been cleaned!"
+    if (Test-Path -Path $consumerOneDrive) {
+        Remove-Item $consumerOneDrive\*
+        Write-Host "Uploaded OneDrive files have been cleaned!" -ForegroundColor Green
+    }
     # Local copies
-    Remove-Item "C:\Temp\packages.log"
-    Remove-Item "C:\Temp\aliases.log"
-    Write-Host "Local copies have been cleaned!"
+    Remove-Item $tempDir\packages.log -ErrorAction SilentlyContinue
+    Remove-Item $tempDir\aliases.log -ErrorAction SilentlyContinue
+    Write-Host "Local .log files have been cleaned!" -ForegroundColor Green
 }
