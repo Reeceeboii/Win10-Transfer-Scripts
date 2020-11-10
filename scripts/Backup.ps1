@@ -5,17 +5,20 @@
     .DESCRIPTION
     Sends the files to consumer OneDrive folder for retrieval on other machines, and to C:\Temp for local testing
 
-    .PARAMETER Packages
+    .PARAMETER packages
     Switch that is enabled if Chocolatey packages are to be backed up
 
-    .PARAMETER Aliases
+    .PARAMETER aliases
     Switch that is enabled if PowerShell aliases are to be backed up
 
-    .PARAMETER RainmeterSkins
+    .PARAMETER rainmeterSkins
     Switch that is enabled if Rainmeter skins and their settings are to be backed up
 
-    .PARAMETER Clean
+    .PARAMETER clean
     Switch that is enabled if created backups are to be removed from C:\Temp and OneDrive
+
+    .PARAMETER all
+    Enables all other backup switches (causing a full backup)
 
     .INPUTS
     None.
@@ -24,32 +27,45 @@
     None
 
     .EXAMPLE
-    PS> Backup.ps1 -Packages -Aliases -RainmeterSkins
+    PS> Backup.ps1 -packages -aliases -rainmeterSkins
     [backs up packages, aliases and Rainmeter skins]
 
     .EXAMPLE
-    PS> Backup.ps1 -Clean
+    PS> Backup.ps1 -all
+    [backs up everything]
+
+    .EXAMPLE
+    PS> Backup.ps1 -clean
     [Removes backup files from C:\Temp and OneDrive]
 #>
 
 param (
-    [switch]$Packages = $false,
-    [switch]$Aliases = $false,
-    [switch]$RainmeterSkins = $false,
-    [switch]$Clean = $false
+    [switch]$packages = $false,
+    [switch]$aliases = $false,
+    [switch]$rainmeterSkins = $false,
+    [switch]$all = $false,
+    [switch]$clean = $false
 )
 
 $tempDir = "C:\Temp"
 $localTemp = Join-Path -Path $PSScriptRoot -ChildPath "backup"
 $consumerOneDrive = Join-Path -Path $env:OneDriveConsumer -ChildPath $backupDirName
 
+# if a full backup is chosen, enable all other switches
+if ($all) {
+    Write-Host "Starting full backup..." -ForegroundColor Yellow
+    $packages = $true
+    $aliases = $true
+    $rainmeterSkins = $true
+}
 
-
+# resolves the file path of the local Rainmeter folder
 function Resolve-RainmeterSkinsPath {
     Join-Path -Path (Resolve-Path -Path "~\Documents") -ChildPath "Rainmeter"
 }
 
-if ($Packages -or $Aliases -or $RainmeterSkins) {
+# create local ./backup folder (remove if it already exists)
+if ($packages -or $aliases -or $rainmeterSkins) {
     if (Test-Path -Path $localTemp) {
         Remove-Item -Force -Recurse $localTemp
     }
@@ -58,21 +74,22 @@ if ($Packages -or $Aliases -or $RainmeterSkins) {
 
 
 # Takes a list of locally installed chocolatey packages and stores them in a log file
-if ($Packages) {
+if ($packages) {
     clist -l -idonly -r | Out-File -Force -FilePath $localTemp\packages.log
     Write-Host "packages.log file created" -ForegroundColor Yellow
 }
 
 # Takes a list of all PowerShell aliases and stores them in a log file
-if ($Aliases) {
+if ($aliases) {
     Get-Alias | ForEach-Object { "$($_.Name),$($_.Definition)" } | Out-File -FilePath $localTemp\aliases.log
     Write-Host "aliases.log file created" -ForegroundColor Yellow
 }
 
 # Makes a copy installed Rainmeter skins and settings 
-if ($RainmeterSkins) {
+if ($rainmeterSkins) {
     $localRainmeterSkins = Resolve-RainmeterSkinsPath
     if (Test-Path -Path $localRainmeterSkins) {
+        Write-Host "Rainmeter skin copy created" -ForegroundColor Yellow
         Copy-Item -Force -Recurse -Path $localRainmeterSkins -Destination $localTemp
     }
     else {
@@ -81,7 +98,7 @@ if ($RainmeterSkins) {
 }
 
 # if any backups were made
-if ($Packages -or $Aliases -or $RainmeterSkins) {
+if ($packages -or $aliases -or $rainmeterSkins) {
     $localRainmeterSkins = Resolve-RainmeterSkinsPath
     $compress = @{
         Path             = ".\backup"
@@ -107,7 +124,7 @@ if ($Packages -or $Aliases -or $RainmeterSkins) {
 }
 
 # Delete package and alias logs from local drive and OneDrive
-if ($Clean) {
+if ($clean) {
     if (Test-Path $localTemp) {
         Remove-Item -Recurse -Force $localTemp
         Write-Host "Local backup temp files removed" -ForegroundColor Green
