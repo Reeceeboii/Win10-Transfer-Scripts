@@ -43,31 +43,37 @@ $tempDir = "C:\Temp"
 $localTemp = Join-Path -Path $PSScriptRoot -ChildPath "backup"
 $consumerOneDrive = Join-Path -Path $env:OneDriveConsumer -ChildPath $backupDirName
 
+
+
+function Resolve-RainmeterSkinsPath {
+    Join-Path -Path (Resolve-Path -Path "~\Documents") -ChildPath "Rainmeter"
+}
+
 if ($Packages -or $Aliases -or $RainmeterSkins) {
     if (Test-Path -Path $localTemp) {
         Remove-Item -Force -Recurse $localTemp
     }
-    New-Item -Path $localTemp -ItemType "directory"
+    New-Item -Path $localTemp -ItemType "directory" | Out-Null # https://bit.ly/3lnQOE8
 }
 
 
 # Takes a list of locally installed chocolatey packages and stores them in a log file
 if ($Packages) {
     clist -l -idonly -r | Out-File -Force -FilePath $localTemp\packages.log
-    Write-Host "packages.log file created" -ForegroundColor Green
+    Write-Host "packages.log file created" -ForegroundColor Yellow
 }
 
 # Takes a list of all PowerShell aliases and stores them in a log file
 if ($Aliases) {
     Get-Alias | ForEach-Object { "$($_.Name),$($_.Definition)" } | Out-File -FilePath $localTemp\aliases.log
-    Write-Host "aliases.log file created" -ForegroundColor Green
+    Write-Host "aliases.log file created" -ForegroundColor Yellow
 }
 
 # Makes a copy installed Rainmeter skins and settings 
 if ($RainmeterSkins) {
-    $rainmeterSkinsLocal = Join-Path -Path (Resolve-Path -Path "~\Documents") -ChildPath "Rainmeter"
-    if (Test-Path $rainmeterSkinsLocal) {
-        Copy-Item -Force -Recurse -Path $rainmeterSkinsLocal -Destination $localTemp
+    $localRainmeterSkins = Resolve-RainmeterSkinsPath
+    if (Test-Path -Path $localRainmeterSkins) {
+        Copy-Item -Force -Recurse -Path $localRainmeterSkins -Destination $localTemp
     }
     else {
         Write-Host "Rainmeter folder doesn't seem to exist?" -ForegroundColor Red
@@ -76,20 +82,27 @@ if ($RainmeterSkins) {
 
 # if any backups were made
 if ($Packages -or $Aliases -or $RainmeterSkins) {
+    $localRainmeterSkins = Resolve-RainmeterSkinsPath
     $compress = @{
         Path             = ".\backup"
         CompressionLevel = "Fastest"
         DestinationPath  = "$($localTemp)\backup.zip"
     }
-    Compress-Archive @compress
-    Write-Host "Backup archive created" -ForegroundColor Green
 
+    # compress local copies of files to a zip archive
+    Compress-Archive @compress
+    Write-Host "Backup archive created" -ForegroundColor Yellow
+
+    # copy log files to C:\Temp
     Copy-Item $localTemp\packages.log $tempDir -ErrorAction SilentlyContinue
     Copy-Item $localTemp\aliases.log $tempDir -ErrorAction SilentlyContinue
-    Copy-Item -Force -Recurse -Path $rainmeterSkinsLocal -Destination $tempDir -ErrorAction SilentlyContinue
-    Write-Host "`tLocal ($($tempDir)) copies created" -ForegroundColor Yellow
+    # copy Rainmeter skins to C:\Temp
+    Copy-Item -Force -Recurse -Path $localRainmeterSkins -Destination $tempDir -ErrorAction SilentlyContinue
+    Write-Host "Local ($($tempDir)) copies created" -ForegroundColor Green
+    
+    # copy backup zip file to OneDrive
     Copy-Item -Force -Path $localTemp\backup.zip -Destination $consumerOneDrive
-    Write-Host "`tOneDrive ($($consumerOneDrive)) copies created" -ForegroundColor Yellow
+    Write-Host "OneDrive ($($consumerOneDrive)) copies created" -ForegroundColor Green
 
 }
 
