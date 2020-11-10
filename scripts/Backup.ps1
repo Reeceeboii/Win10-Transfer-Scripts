@@ -7,16 +7,14 @@
 
     .PARAMETER packages
     Switch that is enabled if Chocolatey packages are to be backed up
-
     .PARAMETER aliases
     Switch that is enabled if PowerShell aliases are to be backed up
-
     .PARAMETER rainmeterSkins
     Switch that is enabled if Rainmeter skins and their settings are to be backed up
-
+    .PARAMETER terminalConfig
+    Switch that is enabled if the Windows Terminal config is to be backed up
     .PARAMETER clean
     Switch that is enabled if created backups are to be removed from C:\Temp and OneDrive
-
     .PARAMETER all
     Enables all other backup switches (causing a full backup)
 
@@ -43,6 +41,7 @@ param (
     [switch]$packages = $false,
     [switch]$aliases = $false,
     [switch]$rainmeterSkins = $false,
+    [switch]$terminalConfig = $false,
     [switch]$all = $false,
     [switch]$clean = $false
 )
@@ -57,6 +56,7 @@ if ($all) {
     $packages = $true
     $aliases = $true
     $rainmeterSkins = $true
+    $terminalConfig = $true
 }
 
 # resolves the file path of the local Rainmeter folder
@@ -65,7 +65,7 @@ function Resolve-RainmeterSkinsPath {
 }
 
 # create local ./backup folder (remove if it already exists)
-if ($packages -or $aliases -or $rainmeterSkins) {
+if ($packages -or $aliases -or $rainmeterSkins -or $terminalConfig) {
     if (Test-Path -Path $localTemp) {
         Remove-Item -Force -Recurse $localTemp
     }
@@ -97,8 +97,15 @@ if ($rainmeterSkins) {
     }
 }
 
+# Makes a copy of the Windows Terminal settings file
+if ($terminalConfig) {
+    $local = Resolve-Path $env:APPDATA\..\local\packages\Microsoft.WindowsTerminal_*\localstate
+    Copy-Item -Path $local\settings.json -Destination $localTemp\settings.json
+    Write-Host "Windows Terminal settings file backed up" -ForegroundColor Yellow
+}
+
 # if any backups were made
-if ($packages -or $aliases -or $rainmeterSkins) {
+if ($packages -or $aliases -or $rainmeterSkins -or $terminalConfig) {
     $localRainmeterSkins = Resolve-RainmeterSkinsPath
     $compress = @{
         Path             = ".\backup"
@@ -111,10 +118,13 @@ if ($packages -or $aliases -or $rainmeterSkins) {
     Write-Host "Backup archive created" -ForegroundColor Yellow
 
     # copy log files to C:\Temp
-    Copy-Item $localTemp\packages.log $tempDir -ErrorAction SilentlyContinue
-    Copy-Item $localTemp\aliases.log $tempDir -ErrorAction SilentlyContinue
+    Copy-Item -Path $localTemp\packages.log -Destination $tempDir -ErrorAction SilentlyContinue
+    Copy-Item -Path $localTemp\aliases.log -Destination $tempDir -ErrorAction SilentlyContinue
     # copy Rainmeter skins to C:\Temp
     Copy-Item -Force -Recurse -Path $localRainmeterSkins -Destination $tempDir -ErrorAction SilentlyContinue
+    # copy Windows Terminal settings to C:\Temp
+    Copy-Item -Path $localTemp\settings.json -Destination $tempDir -ErrorAction SilentlyContinue
+
     Write-Host "Local ($($tempDir)) copies created" -ForegroundColor Green
     
     # copy backup zip file to OneDrive
@@ -137,6 +147,8 @@ if ($clean) {
     Remove-Item $tempDir\packages.log -ErrorAction SilentlyContinue
     Remove-Item $tempDir\aliases.log -ErrorAction SilentlyContinue
     Write-Host "Local .log files have been cleaned!" -ForegroundColor Green
+    Remove-Item $tempDir\settings.json -ErrorAction SilentlyContinue
+    Write-Host "Local Windows Terminal settings have been cleaned!" -ForegroundColor Green
     Remove-Item -Recurse $tempDir\Rainmeter -ErrorAction SilentlyContinue
     Write-Host "Local Rainmeter backups have been cleaned!" -ForegroundColor Green
 }

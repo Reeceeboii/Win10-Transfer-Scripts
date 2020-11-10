@@ -23,7 +23,7 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 - **`Backup.ps1`**
   - ✔️ Backing up currently installed Chocolately packages into a log file
   - ✔️ Backing up all PowerShell command aliases into a log file
-  - 🔧 Backing up the Windows Terminal config file
+  - ✔️ Backing up the Windows Terminal config file
   - ✔️ Backing up installed Rainmeter skins and their config files
   - ✔️ Making an archive of all backed up data and uploading to OneDrive
 
