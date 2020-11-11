@@ -38,6 +38,7 @@ I like Windows machines set up in a particular way, and doing these monotonous c
   - ✔️ Generate new set of SSH keys for auth with GitHub
   - ✔️ Set up global Git info like name/username
   - ✔️ Use a generated alias file from the old system to re-import all CLI aliases
+  - 🔧 Use [Windows-terminal-context-menu](https://github.com/kerol2r20/Windows-terminal-context-menu) to set up context menu entries for Windows Terminal
 
 ## Notes to self
 
