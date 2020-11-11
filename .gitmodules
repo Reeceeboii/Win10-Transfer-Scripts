@@ -1,0 +1,3 @@
+[submodule "utilities-to-install/Windows-terminal-context-menu"]
+	path = utilities-to-install/Windows-terminal-context-menu
+	url = git@github.com:kerol2r20/Windows-terminal-context-menu.git
