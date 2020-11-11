@@ -10,7 +10,7 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 
 - `Main.ps1`: main driver script - does all the heavy lifting.
 - `Test.ps1`: boots up a Windows Sandbox instance to test `Main.ps1` in an isolated environment
-- `Backup.ps1`: makes copies of and backs up files. Moves them to `C:\Temp` for the test script, also uploads them to OneDrive for access on other systems.
+- `Backup-Data.ps1`: makes copies of and backs up files. Moves them to `C:\Temp` for the test script, also uploads them to OneDrive for access on other systems.
 
 ## Features
 
@@ -20,7 +20,7 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 
 - **`Test.ps1`**
   - ✔️ Being able to boot up a Windows Sandbox instance to test the Main.ps1
-- **`Backup.ps1`**
+- **`Backup-Data.ps1`**
   - ✔️ Backing up currently installed Chocolately packages into a log file
   - ✔️ Backing up all PowerShell command aliases into a log file
   - ✔️ Backing up the Windows Terminal config file
