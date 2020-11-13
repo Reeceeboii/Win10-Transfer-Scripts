@@ -9,7 +9,7 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 ## So what do these scripts do?
 
 - `Main.ps1`: main driver script - does all the heavy lifting.
-- `Test.ps1`: boots up a Windows Sandbox instance to test `Main.ps1` in an isolated environment
+- `Invoke-Test.ps1`: boots up a Windows Sandbox instance to test `Main.ps1` in an isolated environment
 - `Backup-Data.ps1`: makes copies of and backs up files. Moves them to `C:\Temp` for the test script, also uploads them to OneDrive for access on the new systems.
 
 ## Features
@@ -18,7 +18,7 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 
 ### On the old system
 
-- **`Test.ps1`**
+- **`Invoke-Test.ps1`**
   - ✔️ Using `Backup-Data.ps1` to create a backup
   - ✔️ Boot up a Windows Sandbox instance to test `Main.ps1` using the newly created backup
 - **`Backup-Data.ps1`**
