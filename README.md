@@ -10,7 +10,7 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 
 - `Main.ps1`: main driver script - does all the heavy lifting.
 - `Test.ps1`: boots up a Windows Sandbox instance to test `Main.ps1` in an isolated environment
-- `Backup-Data.ps1`: makes copies of and backs up files. Moves them to `C:\Temp` for the test script, also uploads them to OneDrive for access on other systems.
+- `Backup-Data.ps1`: makes copies of and backs up files. Moves them to `C:\Temp` for the test script, also uploads them to OneDrive for access on the new systems.
 
 ## Features
 
@@ -19,26 +19,40 @@ I like Windows machines set up in a particular way, and doing these monotonous c
 ### On the old system
 
 - **`Test.ps1`**
-  - ✔️ Being able to boot up a Windows Sandbox instance to test the Main.ps1
+  - ✔️ Using `Backup-Data.ps1` to create a backup
+  - ✔️ Boot up a Windows Sandbox instance to test `Main.ps1` using the newly created backup
 - **`Backup-Data.ps1`**
-  - ✔️ Backing up currently installed Chocolately packages into a log file
-  - ✔️ Backing up all PowerShell command aliases into a log file
-  - ✔️ Backing up the Windows Terminal config file
-  - ✔️ Backing up installed Rainmeter skins and their config files
+  - **Backups**
+    - ✔️ All currently installed Chocolately packages
+    - ✔️ All PowerShell command aliases
+    - ✔️ Windows Terminal config file
+    - ✔️ Home folder of the WSL filesystem
+    - ✔️ Installed Rainmeter skins and their config files
+    - 🔧 Currently saved Rainmeter layout
+    - ✔️ Backing up the current layout of the Start menu
   - ✔️ Making an archive of all backed up data and uploading to OneDrive
 
 ### On the new system
 
 - **`Main.ps1`**
-  - ✔️ Installing chocolatey
-  - ✔️ Using log file to reinstall all software
-  - ✔️ Enabling Windows Sandbox as a Windows feature
-  - ✔️ Enabling WSL & installing Ubuntu
-  - ✔️ Changing Windows Registry settings for things like file extensions and hidden files, folders and drives
-  - ✔️ Generate new set of SSH keys for auth with GitHub
-  - ✔️ Set up global Git info like name/username
-  - ✔️ Use a generated alias file from the old system to re-import all CLI aliases
-  - 🔧 Use [Windows-terminal-context-menu](https://github.com/kerol2r20/Windows-terminal-context-menu) to set up context menu entries for Windows Terminal
+  - **Installations**
+    - ✔️ Installing chocolatey
+    - ✔️ Using log file to reinstall all software
+  - **Windows features and settings**
+    - ✔️ Enabling Windows Sandbox as a Windows feature
+    - ✔️ Enabling WSL as a Windows Feature
+    - 🔧 Downloading and adding the Ubuntu WSL appx file from the web
+    - ✔️ Enabling hidden file and folders' display in the registry
+  - **Git & Development**
+    - ✔️ Generate new set of SSH keys for auth with GitHub
+    - ✔️ Set up global Git info like name/username
+  - **Importing settings and data from backup**
+    - ✔️ Importing PowerShell aliases
+    - 🔧 Importing Rainmeter skins & settings
+    - 🔧 Importing Windows Terminal config file
+    - 🔧 Importing Start Menu layout
+  - **Misc**
+    - 🔧 Use [Windows-terminal-context-menu](https://github.com/kerol2r20/Windows-terminal-context-menu) to set up context menu entries for Windows Terminal
 
 ## Notes to self
 

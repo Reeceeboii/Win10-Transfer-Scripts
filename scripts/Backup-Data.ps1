@@ -15,6 +15,8 @@
     Switch that is enabled if the Windows Terminal config is to be backed up
     .PARAMETER wslHome
     Switch that is enabled if the WSL home folder is to be backed up
+    .PARAMETER startLayout
+    Switch that is enabled if the start menu layout is to be backed up
     .PARAMETER clean
     Switch that is enabled if created backups are to be removed from C:\Temp and OneDrive
     .PARAMETER all
@@ -154,6 +156,12 @@ if ($wslHome) {
     }
 }
 
+# Creates a backup of the current start menu layout
+if ($startLayout) {
+    Export-StartLayout -Path $localTemp\StartLayout.xml
+    Write-BackupOutput "Start menu layout XML file created!" -progress
+}
+
 # if any backups were made
 if (Get-AnyBackupsEnabled) {
     $localRainmeterSkins = Resolve-RainmeterSkinsPath
@@ -167,13 +175,17 @@ if (Get-AnyBackupsEnabled) {
     Compress-Archive @compress
     Write-BackupOutput "Backup archive created" -progress
 
-    # copy log files to C:\Temp
+    # copy local copies to C:\Temp
+
+    # log files
     Copy-Item -Path $localTemp\packages.log -Destination $tempDir -ErrorAction SilentlyContinue
     Copy-Item -Path $localTemp\aliases.log -Destination $tempDir -ErrorAction SilentlyContinue
-    # copy Rainmeter skins to C:\Temp
+    # Rainmeter skins
     Copy-Item -Force -Recurse -Path $localRainmeterSkins -Destination $tempDir\Rainmeter -ErrorAction SilentlyContinue
-    # copy Windows Terminal settings to C:\Temp
+    # Windows Terminal settings
     Copy-Item -Path $localTemp\settings.json -Destination $tempDir -ErrorAction SilentlyContinue
+    # start menu layout
+    Copy-Item -Path $localTemp\StartLayout.xml -Destination $tempDir -ErrorAction SilentlyContinue
 
     # we don't need to copy WSL stuff to local test directory as testing Windows Features within WinSandbox is not possible
 
@@ -207,4 +219,7 @@ if ($clean) {
     # Rainmeter skins
     Remove-Item -Recurse $tempDir\Rainmeter -ErrorAction SilentlyContinue
     Write-BackupOutput "Local Rainmeter backups have been cleaned!"
+    # start menu layout
+    Remove-Item $tempDir\StartLayout.xml -ErrorAction SilentlyContinue
+    Write-BackupOutput "Local Start Menu backup file has been cleaned!"
 }
