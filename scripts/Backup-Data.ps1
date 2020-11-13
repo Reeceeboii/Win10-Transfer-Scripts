@@ -45,6 +45,7 @@ param (
     [switch]$rainmeterSkins = $false,
     [switch]$terminalConfig = $false,
     [switch]$wslHome = $false,
+    [switch]$startLayout = $false,
     [switch]$all = $false,
     [switch]$clean = $false
 )
@@ -52,6 +53,7 @@ param (
 $tempDir = "C:\Temp"
 $localTemp = Join-Path -Path $PSScriptRoot -ChildPath "backup"
 $consumerOneDrive = Join-Path -Path $env:OneDriveConsumer -ChildPath $backupDirName
+$backupSwitchNames = "packages", "aliases", "rainmeterSkins", "terminalConfig", "wslHome", "startLayout"
 
 # outputs progession (yellow), or completion (green) text to the terminal
 function Write-BackupOutput {
@@ -85,25 +87,25 @@ function Resolve-RainmeterSkinsPath {
 }
 
 function Get-AnyBackupsEnabled {
-    foreach ($key in $MyInvocation.BoundParameters.Keys) {
-        write-host (Get-Variable $key).Value
+    foreach ($name in $backupSwitchNames) {
+        if ((Get-Variable -Name $name).Value) {
+            return $true
+        }
     }
-
-    
+    return $false
 }
 
 # if a full backup is chosen, enable all other switches
 if ($all) {
     Write-BackupOutput "Starting full backup..." -progress
-    # todo
+    $backupSwitchNames | ForEach-Object {
+        Set-Variable -Name $_ -Value $true
+    }
 
 }
 
-Get-AnyBackupsEnabled
-exit
-
 # create local ./backup folder (remove if it already exists)
-if ($packages -or $aliases -or $rainmeterSkins -or $terminalConfig) {
+if (Get-AnyBackupsEnabled) {
     if (Test-Path -Path $localTemp) {
         Remove-Item -Force -Recurse $localTemp
     }
@@ -141,8 +143,19 @@ if ($terminalConfig) {
     Write-BackupOutput "Windows Terminal settings file backed up" -progress
 }
 
+# Makes a copy of the home folder of the WSL distro I have installed (ubuntu-xx.xx)
+if ($wslHome) {
+    try {
+        Copy-Item -Recurse -Path "\\wsl$\Ubuntu-20.04\home\reece" -Destination $localTemp\wslHome
+        Write-BackupOutput "WSL home directory backed up!" -progress
+    }
+    catch {
+        Write-BackupOutput "WSL doesn't seem to be accessible. Maybe it isn't running?" -warning
+    }
+}
+
 # if any backups were made
-if ($packages -or $aliases -or $rainmeterSkins -or $terminalConfig) {
+if (Get-AnyBackupsEnabled) {
     $localRainmeterSkins = Resolve-RainmeterSkinsPath
     $compress = @{
         Path             = ".\backup"
@@ -158,9 +171,11 @@ if ($packages -or $aliases -or $rainmeterSkins -or $terminalConfig) {
     Copy-Item -Path $localTemp\packages.log -Destination $tempDir -ErrorAction SilentlyContinue
     Copy-Item -Path $localTemp\aliases.log -Destination $tempDir -ErrorAction SilentlyContinue
     # copy Rainmeter skins to C:\Temp
-    Copy-Item -Force -Recurse -Path $localRainmeterSkins -Destination $tempDir -ErrorAction SilentlyContinue
+    Copy-Item -Force -Recurse -Path $localRainmeterSkins -Destination $tempDir\Rainmeter -ErrorAction SilentlyContinue
     # copy Windows Terminal settings to C:\Temp
     Copy-Item -Path $localTemp\settings.json -Destination $tempDir -ErrorAction SilentlyContinue
+
+    # we don't need to copy WSL stuff to local test directory as testing Windows Features within WinSandbox is not possible
 
     Write-BackupOutput "Local ($($tempDir)) copies created"
     
@@ -181,11 +196,15 @@ if ($clean) {
     Write-BackupOutput "OneDrive zip removed!"
 
     # Local copies
+    
+    # logs
     Remove-Item $tempDir\packages.log -ErrorAction SilentlyContinue
     Remove-Item $tempDir\aliases.log -ErrorAction SilentlyContinue
     Write-BackupOutput "Local .log files have been cleaned!"
+    # terminal config
     Remove-Item $tempDir\settings.json -ErrorAction SilentlyContinue
     Write-BackupOutput "Local Windows Terminal settings have been cleaned!"
+    # Rainmeter skins
     Remove-Item -Recurse $tempDir\Rainmeter -ErrorAction SilentlyContinue
     Write-BackupOutput "Local Rainmeter backups have been cleaned!"
 }
