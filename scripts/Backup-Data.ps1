@@ -52,36 +52,12 @@ param (
     [switch]$clean = $false
 )
 
+Import-Module $PSScriptRoot\utils\Write-CustomOutput
+
 $tempDir = "C:\Temp"
 $localTemp = Join-Path -Path $PSScriptRoot -ChildPath "backup"
 $consumerOneDrive = Join-Path -Path $env:OneDriveConsumer -ChildPath $backupDirName
 $backupSwitchNames = "packages", "aliases", "rainmeterSkins", "terminalConfig", "wslHome", "startLayout"
-
-# outputs progession (yellow), or completion (green) text to the terminal
-function Write-BackupOutput {
-    param (
-        # the progression text to be send to the console
-        [Parameter(Mandatory = $true)]
-        [Object]
-        $content,
-        # whether or not the text is to do with progress or completion
-        [switch]
-        $progress,
-        # if the output is a warning message
-        [switch]
-        $warning
-    )
-
-    if ($progress) {
-        Write-Host $content -ForegroundColor Yellow
-    }
-    elseif ($warning) {
-        Write-Host $content -ForegroundColor Red
-    }
-    else { 
-        Write-Host $content -ForegroundColor Green 
-    }
-}
 
 # resolves the file path of the local Rainmeter folder
 function Resolve-RainmeterSkinsPath {
@@ -99,7 +75,7 @@ function Get-AnyBackupsEnabled {
 
 # if a full backup is chosen, enable all other switches
 if ($all) {
-    Write-BackupOutput "Starting full backup..." -progress
+    Write-CustomOutput "Starting full backup..." -progress
     $backupSwitchNames | ForEach-Object {
         Set-Variable -Name $_ -Value $true
     }
@@ -117,24 +93,24 @@ if (Get-AnyBackupsEnabled) {
 # Takes a list of locally installed chocolatey packages and stores them in a log file
 if ($packages) {
     clist -l -idonly -r | Out-File -Force -FilePath $localTemp\packages.log
-    Write-BackupOutput "packages.log file created" -progress
+    Write-CustomOutput "packages.log file created" -progress
 }
 
 # Takes a list of all PowerShell aliases and stores them in a log file
 if ($aliases) {
     Get-Alias | ForEach-Object { "$($_.Name),$($_.Definition)" } | Out-File -FilePath $localTemp\aliases.log
-    Write-BackupOutput "aliases.log file created" -progress
+    Write-CustomOutput "aliases.log file created" -progress
 }
 
 # Makes a copy installed Rainmeter skins and settings 
 if ($rainmeterSkins) {
     $localRainmeterSkins = Resolve-RainmeterSkinsPath
     if (Test-Path -Path $localRainmeterSkins) {
-        Write-BackupOutput "Rainmeter skin copy created" -progress
+        Write-CustomOutput "Rainmeter skin copy created" -progress
         Copy-Item -Force -Recurse -Path $localRainmeterSkins -Destination $localTemp
     }
     else {
-        Write-BackupOutput "Rainmeter folder doesn't seem to exist?" -warning
+        Write-CustomOutput "Rainmeter folder doesn't seem to exist?" -warning
     }
 }
 
@@ -142,24 +118,24 @@ if ($rainmeterSkins) {
 if ($terminalConfig) {
     $local = Resolve-Path $env:APPDATA\..\local\packages\Microsoft.WindowsTerminal_*\localstate
     Copy-Item -Path $local\settings.json -Destination $localTemp\settings.json
-    Write-BackupOutput "Windows Terminal settings file backed up" -progress
+    Write-CustomOutput "Windows Terminal settings file backed up" -progress
 }
 
 # Makes a copy of the home folder of the WSL distro I have installed (ubuntu-xx.xx)
 if ($wslHome) {
     try {
         Copy-Item -Recurse -Path "\\wsl$\Ubuntu-20.04\home\reece" -Destination $localTemp\wslHome
-        Write-BackupOutput "WSL home directory backed up!" -progress
+        Write-CustomOutput "WSL home directory backed up!" -progress
     }
     catch {
-        Write-BackupOutput "WSL doesn't seem to be accessible. Maybe it isn't running?" -warning
+        Write-CustomOutput "WSL doesn't seem to be accessible. Maybe it isn't running?" -warning
     }
 }
 
 # Creates a backup of the current start menu layout
 if ($startLayout) {
     Export-StartLayout -Path $localTemp\StartLayout.xml
-    Write-BackupOutput "Start menu layout XML file created!" -progress
+    Write-CustomOutput "Start menu layout XML file created!" -progress
 }
 
 # if any backups were made
@@ -173,7 +149,7 @@ if (Get-AnyBackupsEnabled) {
 
     # compress local copies of files to a zip archive
     Compress-Archive @compress
-    Write-BackupOutput "Backup archive created" -progress
+    Write-CustomOutput "Backup archive created" -progress
 
     # copy local copies to C:\Temp
 
@@ -189,11 +165,11 @@ if (Get-AnyBackupsEnabled) {
 
     # we don't need to copy WSL stuff to local test directory as testing Windows Features within WinSandbox is not possible
 
-    Write-BackupOutput "Local ($($tempDir)) copies created"
+    Write-CustomOutput "Local ($($tempDir)) copies created"
     
     # copy backup zip file to OneDrive
     Copy-Item -Force -Path $localTemp\backup.zip -Destination $consumerOneDrive
-    Write-BackupOutput "OneDrive ($($consumerOneDrive)) copies created"
+    Write-CustomOutput "OneDrive ($($consumerOneDrive)) copies created"
 
 }
 
@@ -201,25 +177,25 @@ if (Get-AnyBackupsEnabled) {
 if ($clean) {
     if (Test-Path $localTemp) {
         Remove-Item -Recurse -Force $localTemp
-        Write-BackupOutput "Local backup temp files removed"
+        Write-CustomOutput "Local backup temp files removed"
     }
     # OneDrive files
     Remove-Item $consumerOneDrive\backup.zip -ErrorAction SilentlyContinue
-    Write-BackupOutput "OneDrive zip removed!"
+    Write-CustomOutput "OneDrive zip removed!"
 
     # Local copies
     
     # logs
     Remove-Item $tempDir\packages.log -ErrorAction SilentlyContinue
     Remove-Item $tempDir\aliases.log -ErrorAction SilentlyContinue
-    Write-BackupOutput "Local .log files have been cleaned!"
+    Write-CustomOutput "Local .log files have been cleaned!"
     # terminal config
     Remove-Item $tempDir\settings.json -ErrorAction SilentlyContinue
-    Write-BackupOutput "Local Windows Terminal settings have been cleaned!"
+    Write-CustomOutput "Local Windows Terminal settings have been cleaned!"
     # Rainmeter skins
     Remove-Item -Recurse $tempDir\Rainmeter -ErrorAction SilentlyContinue
-    Write-BackupOutput "Local Rainmeter backups have been cleaned!"
+    Write-CustomOutput "Local Rainmeter backups have been cleaned!"
     # start menu layout
     Remove-Item $tempDir\StartLayout.xml -ErrorAction SilentlyContinue
-    Write-BackupOutput "Local Start Menu backup file has been cleaned!"
+    Write-CustomOutput "Local Start Menu backup file has been cleaned!"
 }

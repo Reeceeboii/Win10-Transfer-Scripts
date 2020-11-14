@@ -1,6 +1,5 @@
 <Configuration>
-    <Networking>Enable</Networking>
-    <VGpu>Enable</VGpu> 
+    <vGPU>Enable</vGPU>
     <MappedFolders>
         <MappedFolder>
             <HostFolder>C:\Temp</HostFolder>
@@ -10,4 +9,5 @@
     <LogonCommand>
         <Command>powershell.exe -noexit -command "cd ~/Desktop/Temp"</Command>
     </LogonCommand>
+    <MemoryInMB>8192</MemoryInMB>
 </Configuration>

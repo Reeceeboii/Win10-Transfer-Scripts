@@ -1,23 +1,22 @@
 ﻿#Requires -RunAsAdministrator
 
-$temp_dir = "C:\Temp"
+Import-Module $PSScriptRoot\utils\Write-CustomOutput
 
-# Is the Windows sandbox optional feature turned on?
-function sandboxEnabled {
+$tempDir = "C:\Temp"
+
+# Is the Windows Sandbox optional feature turned on?
+function Get-WindowsSandboxEnabled {
     [bool](Get-WindowsOptionalFeature -Online | Where-Object FeatureName -eq Containers-DisposableClientVM).State
 }
 
-
 # Is windows sandbox enabled on this system?
-if (sandboxEnabled) {
-    # Generate and copy the packages & aliases log to C:\Temp
-    ./Backup-Data.ps1 -Packages -Aliases
-    Copy-Item ./packages.log $temp_dir
-    Copy-Item ./aliases.log $temp_dir
-    # And the same for the main script
-    Copy-Item ./Main.ps1 $temp_dir
-    Write-Host "Main script and package log generated and copied to $temp_dir, opening VM..."
-    Write-Host "At the PowerShell prompt: 'Set-ExecutionPolicy unrestricted -Scope CurrentUser -Force' before executing script"
+if (Get-WindowsSandboxEnabled) {
+    # run a full backup
+    ./Backup-Data.ps1 -all
+    # copy main script to temp directory
+    Copy-Item ./Main.ps1 $tempDir
+    Write-CustomOutput "Main script copied to $tempDir, opening VM..."
+    Write-CustomOutput "At the PowerShell prompt: 'Set-ExecutionPolicy unrestricted -Scope CurrentUser -Force' before executing script" -progress
     # Make sure there's a file ext. association here dummy
     ./WindowsVMConfig.wsb
 }
@@ -25,11 +24,11 @@ else {
     # Do I actually want to enable it?
     $resp = Read-Host -Prompt "Windows Sandbox is not enabled, would you like to enable? [Y/N]: "
     if ($resp.ToLower() -eq "y") {
-        Write-Host "Attempting to enable Windows Sandbox..."
+        Write-CustomOutput "Attempting to enable Windows Sandbox..." -progress
         # Enable the 'Containers-DisposableClientVM' (sandbox) feature
         Enable-WindowsOptionalFeature -FeatureName Containers-DisposableClientVM -Online -NoRestart -ErrorAction Stop
     }
     else {
-        Write-Host "Exiting..."
+        Write-CustomOutput "Exiting..." -warning
     }
 }
