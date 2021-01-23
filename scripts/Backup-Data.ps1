@@ -11,6 +11,8 @@
     Switch that is enabled if PowerShell aliases are to be backed up
     .PARAMETER rainmeterSkins
     Switch that is enabled if Rainmeter skins and their settings are to be backed up
+    .PARAMETER rainmeterLayouts
+    Switch that is enabled if Rainmeter layouts and their settings are to be backed up
     .PARAMETER terminalConfig
     Switch that is enabled if the Windows Terminal config is to be backed up
     .PARAMETER wslHome
@@ -45,6 +47,7 @@ param (
     [switch]$packages = $false,
     [switch]$aliases = $false,
     [switch]$rainmeterSkins = $false,
+    [switch]$rainmeterLayouts = $false,
     [switch]$terminalConfig = $false,
     [switch]$wslHome = $false,
     [switch]$startLayout = $false,
@@ -57,7 +60,7 @@ Import-Module $PSScriptRoot\utils\Write-CustomOutput
 $tempDir = "C:\Temp"
 $localTemp = Join-Path -Path $PSScriptRoot -ChildPath "backup"
 $consumerOneDrive = Join-Path -Path $env:OneDriveConsumer -ChildPath $backupDirName
-$backupSwitchNames = "packages", "aliases", "rainmeterSkins", "terminalConfig", "wslHome", "startLayout"
+$backupSwitchNames = "packages", "aliases", "rainmeterSkins", "rainmeterLayouts", "terminalConfig", "wslHome", "startLayout"
 
 # resolves the file path of the local Rainmeter folder
 function Resolve-RainmeterSkinsPath {
@@ -114,10 +117,24 @@ if ($rainmeterSkins) {
     }
 }
 
+# Makes a copy of Rainmeter layout and their related settings
+if ($rainmeterLayouts) {
+    $layoutsLocation = Join-Path -Path $env:APPDATA -ChildPath Rainmeter\Layouts
+    if (Test-Path -Path $layoutsLocation) {
+        Get-ChildItem $layoutsLocation | Where-Object {
+            $_.Name -match "ReeceLayout[0-9]" 
+        } | ForEach-Object {
+            Copy-Item -Recurse $_.FullName -Destination "$($localTemp)\RainmeterLayouts\$($_.Name)"
+        }
+        Write-CustomOutput "Rainmeter layout copy created" -progress
+    }
+}
+
 # Makes a copy of the Windows Terminal settings file
 if ($terminalConfig) {
     $local = Resolve-Path $env:APPDATA\..\local\packages\Microsoft.WindowsTerminal_*\localstate
-    Copy-Item -Path $local\settings.json -Destination $localTemp\settings.json
+    New-Item -ItemType Directory -Path $localTemp\WindowsTerminal | Out-Null
+    Copy-Item -Path $local\settings.json -Destination $localTemp\WindowsTerminal\settings.json
     Write-CustomOutput "Windows Terminal settings file backed up" -progress
 }
 
