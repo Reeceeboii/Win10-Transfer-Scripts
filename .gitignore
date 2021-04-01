@@ -2,3 +2,4 @@
 *.log
 # local temp backup directory
 backup/
+.vs
